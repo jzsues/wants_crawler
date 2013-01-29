@@ -46,24 +46,31 @@ amaCategory.loop = function() {
 				datas.forEach(function(data) {
 					amaCategory.execute(data);
 				});
+			} else {
+				_ama_category_scan_status = _status.stop;
 			}
 		}
 	});
 }
 
 amaCategory.start = function(callback) {
-	categoryQueryDao.count({}, function(error, count) {
-		if (error)
-			logger.error(error);
-		if (count == 0) {
-			amaCategory.execute({
-				url : amaCategory.beginUrl
-			});
-		} else {
-			amaCategory.loop();
-		}
-	});
-
+	if (_ama_category_scan_status == _status.stop) {
+		_ama_category_scan_status = _status.runing;
+		categoryQueryDao.count({}, function(error, count) {
+			if (error)
+				logger.error(error);
+			if (count == 0) {
+				amaCategory.execute({
+					url : amaCategory.beginUrl
+				});
+			} else {
+				amaCategory.loop();
+			}
+		});
+	} else {
+		logger.debug("ama category scan queue is runing!");
+	}
+	callback();
 };
 
 amaCategory.execute = function(parent) {
