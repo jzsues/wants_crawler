@@ -1,7 +1,7 @@
 var amaCategoryHtmlRender = {};
 // var $ = require('jquery');
 var fs = require('fs');
-var jquery = fs.readFileSync("../jquery.js").toString();
+var jquery = fs.readFileSync("./jquery.js").toString();
 var jsdom = require("jsdom");
 var emsg = {
 	htmlerror : 'HTML格式有误'

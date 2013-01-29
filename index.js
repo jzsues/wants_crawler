@@ -9,5 +9,5 @@ _monitor = require('./lib/monitor.js');// 用于存储系统运行统计信息
 
 var httpServer = http.createServer(wants());
 httpServer.listen(config.listenPort, function() {
-	logger.debug("wants nodejs framework runing,version:" + utils.getVersion());
+	logger.debug("wants nodejs framework runing,version:" + utils.getVersion() + ",http server listen on:" + config.listenPort);
 });
