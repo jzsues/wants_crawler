@@ -1,0 +1,31 @@
+{
+  "name":"wants_crawler",
+  "version":"0.0.1",
+  "main": "proxy.js",
+  "bin": {
+    "proxy" : "proxy.js"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "engines": {
+    "node": ">=0.8.1"
+  },
+  "dependencies": {
+    "wants": "0.1.1",
+    "http-proxy": "0.8.7",
+    "request": "2.11.4",
+    "async":"0.1.22",
+    "jsdom":"0.2.19",
+    "jquery":"1.8.2",
+    "mongodb":"1.2.9",
+    "underscore":"1.4.3",
+    "qs": "0.5.3"
+  },
+  "devDependencies": {
+  	"should": "*",
+    "mocha": "*",
+    "dox": "*"
+   },
+  "readme":"wants proxy provider in nodejs"
+}
