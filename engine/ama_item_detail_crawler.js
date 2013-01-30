@@ -36,7 +36,7 @@ var httpQueue = new TaskQueue({
 amaItemDetail.loop = function() {
 	rankItemDao.find({
 		fetch_mark_batch : null
-	}, 10, false, false, false, function(error, datas) {
+	}, 100, false, false, false, function(error, datas) {
 		if (error) {
 			logger.error(error);
 		} else {
