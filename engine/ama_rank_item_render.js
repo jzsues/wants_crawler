@@ -2,13 +2,13 @@ var amaRankItemHtmlRender = {};
 var wants = require("wants");
 var logger = wants.logger;
 var fs = require('fs');
-var jquery = fs.readFileSync("../jquery.js").toString();
+var jquery = fs.readFileSync("./jquery.js").toString();
 var jsdom = require("jsdom");
 var emsg = {
 	htmlerror : 'HTML格式有误'
 };
 
-amaRankItemHtmlRender.render = function(body, cb) {
+amaRankItemHtmlRender.render = function(body, cb, context) {
 	if (body) {
 		jsdom.env({
 			html : body,
@@ -59,15 +59,17 @@ amaRankItemHtmlRender.render = function(body, cb) {
 								list_price : $.trim(list_price),
 								price : $.trim(price),
 								you_save : $.trim(you_save),
-								other_price : $.trim(other_price)
+								other_price : $.trim(other_price),
+								category : context.category,
+								type : context.type
 							});
 						}
 					});
+					cb(null, items, context);
 				} catch (e) {
 					cb(e);
 				}
 				window.close();
-				cb(null, items);
 			}
 		});
 	} else {
