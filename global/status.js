@@ -1,6 +1,8 @@
 var Status = {
 	stop : "stop",
-	runing : "runing"
+	runing : "runing",
+	success : "success",
+	error : "error"
 };
 _ama_category_scan_status = Status.stop;
 _ama_rank_item_scan_status = Status.stop;

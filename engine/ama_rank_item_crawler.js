@@ -22,6 +22,15 @@ var treeLoader = new TreeLoader({
 	rootLoader : function(callback) {
 		categoryDao.findone({
 			category : "baby-products"
+		// $or : [ {
+		// batch : {
+		// $ne : amaRankItem.batch
+		// }
+		// }, {
+		// status : {
+		// $ne : _status.success
+		// }
+		// } ]
 		}, false, function(error, data) {
 			callback(error, data)
 		});
@@ -29,6 +38,15 @@ var treeLoader = new TreeLoader({
 	childLoader : function(parent, callback) {
 		categoryDao.find({
 			parent : parent.category
+		// $or : [ {
+		// batch : {
+		// $ne : amaRankItem.batch
+		// }
+		// }, {
+		// status : {
+		// $ne : _status.success
+		// }
+		// } ]
 		}, false, false, false, false, function(error, datas) {
 			callback(error, datas)
 		});
@@ -64,40 +82,67 @@ var httpQueue = new TaskQueue({
 		_ama_rank_item_scan_status = _status.stop;
 	}
 });
+amaRankItem.loop = function() {
+	treeLoader.all(function(error, results) {
+		if (results.length > 1) {
+			results.forEach(function(data) {
+				if (data.status != _status.success || data.batch != amaRankItem.batch) {
+					amaRankItem.fetch(data, function(error, category) {
+						var task = null;
+						if (error) {
+							logger.error("amaRankItem fetch with error:" + error);
+							task = {
+								category : category,
+								run : function(cb) {
+									categoryDao.update({
+										category : this.category
+									}, {
+										batch : amaRankItem.batch,
+										status : _status.error
+									}, function(err, data) {
+										if (err)
+											cb(err)
+										cb(null, data);
+									});
+								}
+							};
+						} else {
+							task = {
+								category : category,
+								run : function(cb) {
+									categoryDao.update({
+										category : this.category
+									}, {
+										batch : amaRankItem.batch,
+										status : _status.success
+									}, function(err, data) {
+										if (err)
+											cb(err)
+										cb(null, data);
+									});
+								}
+							};
+						}
+						categoryDbQueue.push(task, function(err, data) {
+							if (err)
+								logger.error("categoryDao update with error:" + err);
+						});
+
+					});
+				} else {
+					logger.debug("category:" + data.category + ",name:" + data.name + " had been fetch");
+				}
+			});
+
+		}
+	});
+};
 
 amaRankItem.start = function(callback) {
 	if (_ama_rank_item_scan_status == _status.stop) {
 		amaRankItem.batch = utils.fdate();
 		_ama_rank_item_scan_status = _status.runing;
-		treeLoader.all(function(error, results) {
-			results.forEach(function(data) {
-				amaRankItem.fetch(data, function(error, category) {
-					if (error) {
-						logger.error("amaRankItem fetch with error:" + error);
-					} else {
-						var task = {
-							category : category,
-							run : function(cb) {
-								categoryDao.update({
-									category : this.category
-								}, {
-									batch : amaRankItem.batch
-								}, function(err, data) {
-									if (err)
-										cb(err)
-									cb(null, data);
-								});
-							}
-						};
-						categoryDbQueue.push(task, function(err, data) {
-							if (err)
-								logger.error("categoryDao update with error:" + err);
-						});
-					}
-				});
-			});
-		});
-
+		amaRankItem.loop();
 		callback();
 	} else {
 		logger.debug("ama rank item scan queue is runing!");

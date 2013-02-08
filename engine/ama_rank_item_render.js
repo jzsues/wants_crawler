@@ -10,12 +10,13 @@ var emsg = {
 
 amaRankItemHtmlRender.render = function(body, cb, context) {
 	if (body) {
-		jsdom.env({
-			html : body,
-			src : [ jquery ],
-			done : function(errors, window) {
-				var $ = window.$;
-				try {
+		try {
+			jsdom.env({
+				html : body,
+				src : [ jquery ],
+				done : function(errors, window) {
+					var $ = window.$;
+
 					var rows = $(body).find(".zg_itemRow");
 					var items = [];
 					$.each(rows, function(index, row) {
@@ -66,14 +67,14 @@ amaRankItemHtmlRender.render = function(body, cb, context) {
 						}
 					});
 					cb(null, items, context);
-				} catch (e) {
-					cb(e);
+					window.close();
 				}
-				window.close();
-			}
-		});
+			});
+		} catch (e) {
+			cb(e, null, context);
+		}
 	} else {
-		cb("empty response body");
+		cb("empty response body", null, context);
 	}
 
 }
