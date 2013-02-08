@@ -5,6 +5,7 @@ var TaskQueue = require("../lib/task_queue");
 var httpConnector = require("../lib/http_connector");
 var rankItemHtmlRender = require("./ama_rank_item_render");
 var GenericDao = require("../dao/generic_dao");
+var TreeLoader = require("../lib/tree_loader");
 
 var amaRankItem = {
 	category_name : "ama_category",
@@ -16,6 +17,23 @@ var amaRankItem = {
 	current_category : "baby-products",
 	metas : []
 };
+
+var treeLoader = new TreeLoader({
+	rootLoader : function(callback) {
+		categoryDao.findone({
+			category : "baby-products"
+		}, false, function(error, data) {
+			callback(error, data)
+		});
+	},
+	childLoader : function(parent, callback) {
+		categoryDao.find({
+			parent : parent.category
+		}, false, false, false, false, function(error, datas) {
+			callback(error, datas)
+		});
+	}
+});
 
 var categoryDao = new GenericDao({
 	colname : amaRankItem.category_name
@@ -43,105 +61,44 @@ var httpQueue = new TaskQueue({
 	size : 10,
 	drain : function() {
 		logger.debug("rank item Http Queue drain");
-		amaRankItem.loop();
+		_ama_rank_item_scan_status = _status.stop;
 	}
 });
-
-amaRankItem.loop = function() {
-	logger.debug("begin loop parent category:" + amaRankItem.current_category);
-	categoryDao.find({
-		parent : amaRankItem.current_category,
-		batch : {
-			$ne : amaRankItem.batch
-		}
-	}, 1, false, false, {
-		"_id" : 1
-	}, function(error, datas) {
-		if (!error) {
-			if (datas.length > 0) {
-				datas.forEach(function(data) {
-					amaRankItem.fetch(data, function(error, category) {
-						if (error) {
-							logger.error("amaRankItem fetch with error:" + error);
-						} else {
-							var task = {
-								category : category,
-								run : function(cb) {
-									categoryDao.update({
-										category : this.category
-									}, {
-										batch : amaRankItem.batch
-									}, function(err, data) {
-										if (err)
-											cb(err)
-										cb(null, data);
-									});
-								}
-							};
-							categoryDbQueue.push(task, function(err, data) {
-								if (err)
-									logger.error("categoryDao update with error:" + err);
-							});
-						}
-					});
-				});
-			} else {
-				if (amaRankItem.metas.length == 0) {
-					_ama_rank_item_scan_status = _status.stop;
-				} else {
-					amaRankItem.current_category = amaRankItem.metas.pop();
-					amaRankItem.loop();
-				}
-			}
-		}
-	});
-};
-
-amaRankItem.findMetaCategory = function(callback) {
-	categoryDao.find({
-		parent : amaRankItem.parent_meta_category
-	}, false, false, false, {
-		"_id" : 1
-	}, function(error, datas) {
-		if (error)
-			callback(error);
-		else {
-			var parents = [];
-			datas.forEach(function(data) {
-				parents.push(data.category);
-				amaRankItem.metas.push(data.category);
-			});
-			categoryDao.find({
-				parent : {
-					$in : parents
-				}
-			}, false, false, false, {
-				"_id" : 1
-			}, function(err, ds) {
-				if (err)
-					callback(err);
-				else {
-					ds.forEach(function(data) {
-						amaRankItem.metas.push(data.category);
-					});
-					callback(null);
-				}
-			});
-		}
-	});
-};
 
 amaRankItem.start = function(callback) {
 	if (_ama_rank_item_scan_status == _status.stop) {
 		amaRankItem.batch = utils.fdate();
 		_ama_rank_item_scan_status = _status.runing;
-		amaRankItem.findMetaCategory(function(error) {
-			if (error)
-				logger.error("ama rank item scan meta category query with error:" + error);
-			else
-				amaRankItem.loop();
-			callback();
+		treeLoader.all(function(error, results) {
+			results.forEach(function(data) {
+				amaRankItem.fetch(data, function(error, category) {
+					if (error) {
+						logger.error("amaRankItem fetch with error:" + error);
+					} else {
+						var task = {
+							category : category,
+							run : function(cb) {
+								categoryDao.update({
+									category : this.category
+								}, {
+									batch : amaRankItem.batch
+								}, function(err, data) {
+									if (err)
+										cb(err)
+									cb(null, data);
+								});
+							}
+						};
+						categoryDbQueue.push(task, function(err, data) {
+							if (err)
+								logger.error("categoryDao update with error:" + err);
+						});
+					}
+				});
+			});
 		});
+
+		callback();
 	} else {
 		logger.debug("ama rank item scan queue is runing!");
 		callback();
@@ -177,7 +134,8 @@ amaRankItem.fetch = function(category, callback) {
 				if (context) {
 					callback(null, context.category);
 				} else {
-					logger.debug(arguments);
+					// logger.debug(arguments);
+					callback("fetch context error", context.category)
 				}
 			}
 		});
@@ -195,9 +153,7 @@ amaRankItem.updateRankItemTask = function(item) {
 			rankItemDao.update({
 				md5 : this.data.md5
 			}, this.data, function(error, data) {
-				if (error)
-					cb(error);
-				cb(null, data);
+				cb(error, data);
 			});
 		}
 	};
@@ -224,9 +180,7 @@ amaRankItem.fetchRankItemTask = function(category, type) {
 					category : this.data.category.category,
 					type : this.data.type
 				}, function(error, items, context) {
-					if (error)
-						cb(error);
-					cb(null, items, context);
+					cb(error, items, context);
 				});
 			}
 		};
@@ -245,9 +199,7 @@ amaRankItem.fetchRankItemTask = function(category, type) {
 					category : this.data.category.category,
 					type : this.data.type
 				}, function(error, items, context) {
-					if (error)
-						cb(error);
-					cb(null, items, context);
+					cb(error, items, context);
 				});
 			}
 		};
