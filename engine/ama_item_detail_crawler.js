@@ -8,12 +8,13 @@ var GenericDao = require("../dao/generic_dao");
 var amaItemDetail = {
 	rank_item_name : "ama_rank_item",
 	item_detail_name : "item_detail",
+	item_index_name : "ama_item_index",
 	base_url : "http://www.amazon.com/gp/product/_asin_",
 	batch : utils.fdate()
 };
 
-var rankItemDao = new GenericDao({
-	colname : amaItemDetail.rank_item_name
+var itemIndexDao = new GenericDao({
+	colname : amaItemDetail.item_index_name
 });
 
 var itemDetailDao = new GenericDao({
@@ -26,7 +27,7 @@ var dbQueue = new TaskQueue({
 	}
 });
 var httpQueue = new TaskQueue({
-	size : 50,
+	size : 10,
 	drain : function() {
 		logger.debug("item detail Http Queue drain");
 		amaItemDetail.loop();
@@ -34,9 +35,10 @@ var httpQueue = new TaskQueue({
 });
 
 amaItemDetail.loop = function() {
-	rankItemDao.find({
-		fetch_mark_batch : {
-			$ne : amaItemDetail.batch
+	itemIndexDao.find({
+		batch : amaItemDetail.batch,
+		status : {
+			$ne : "success"
 		}
 	}, 100, false, false, false, function(error, datas) {
 		if (error) {
@@ -44,8 +46,8 @@ amaItemDetail.loop = function() {
 		} else {
 			if (datas.length > 0) {
 				var fetchTasks = [];
-				datas.forEach(function(rank) {
-					var fetchTask = amaItemDetail.fetchTask(rank);
+				datas.forEach(function(index) {
+					var fetchTask = amaItemDetail.fetchTask(index);
 					fetchTasks.push(fetchTask);
 				});
 				httpQueue.pushAll(fetchTasks, function(error, item, context) {
@@ -56,10 +58,15 @@ amaItemDetail.loop = function() {
 								logger.error("update item detail with " + err);
 							}
 						});
-						var updateRankTask = amaItemDetail.updateRankTask(context.asin);
-						dbQueue.push(updateRankTask, function(err, res) {
-							if (err)
-								logger.error("update item rank with " + err);
+						var index = {
+							asin : context.asin,
+							status : "success"
+						};
+						var updateItemIndexTask = amaItemDetail.updateItemIndexTask(index);
+						dbQueue.push(updateItemIndexTask, function(err, res) {
+							if (err) {
+								logger.error("update item index with " + err);
+							}
 						});
 					}
 				});
@@ -80,20 +87,18 @@ amaItemDetail.start = function(callback) {
 	callback();
 }
 
-amaItemDetail.updateRankTask = function(asin) {
+amaItemDetail.updateItemIndexTask = function(index) {
 	return {
-		data : asin,
+		data : index,
 		run : function(cb) {
-			rankItemDao.update({
-				asin : this.data
-			}, {
-				fetch_mark_batch : amaItemDetail.batch
-			}, function(error, result) {
+			itemIndexDao.update({
+				asin : this.data.asin
+			}, this.data, function(error, result) {
 				cb(error, result);
 			});
 		}
-	};
-};
+	}
+}
 
 amaItemDetail.updateItemDetailTask = function(item) {
 	return {
@@ -108,9 +113,9 @@ amaItemDetail.updateItemDetailTask = function(item) {
 	};
 }
 
-amaItemDetail.fetchTask = function(rank) {
+amaItemDetail.fetchTask = function(item) {
 	return {
-		data : rank.asin,
+		data : item.asin,
 		run : function(cb) {
 			var asin = this.data;
 			var url = amaItemDetail.base_url;

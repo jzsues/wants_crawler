@@ -23,7 +23,7 @@ amaItemDetailRender.render = function(body, cb, context) {
 						restlog.error("--------------error body begin-----------------");
 						restlog.error(body);
 						restlog.error("--------------error body end-----------------");
-						return cb(emsg.htmlerror);
+						return cb(emsg.htmlerror, null, context);
 					}
 					data.name = e_name.text();
 					var e_list_price = page.find("#listPriceValue");
@@ -40,7 +40,7 @@ amaItemDetailRender.render = function(body, cb, context) {
 					}
 					if (e_cover_img.find("img").length == 0) {
 						e_cover_img = page.find("#holderMainImage");
-						//console.log(e_cover_img.html());
+						// console.log(e_cover_img.html());
 					}
 					data.cover_img = e_cover_img.find("img").attr("src");
 					var e_thumb_strip = page.find("#thumb_strip");
@@ -62,13 +62,13 @@ amaItemDetailRender.render = function(body, cb, context) {
 					data.prd_desc = e_prd_desc.html();
 					cb(null, data, context);
 				} catch (e) {
-					cb(e);
+					cb(e, null, context);
 				}
 				window.close();
 			}
 		});
 	} else {
-		cb("empty response body");
+		cb("empty response body", null, context);
 	}
 
 };
