@@ -76,7 +76,7 @@ var rankItemUpdateDbQueue = new TaskQueue({
 });
 
 var httpQueue = new TaskQueue({
-	size : 10,
+	size : 50,
 	drain : function() {
 		logger.debug("rank item Http Queue drain");
 		_ama_rank_item_scan_status = _status.stop;
