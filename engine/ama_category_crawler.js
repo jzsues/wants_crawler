@@ -95,20 +95,24 @@ amaCategory.fetch = function(parent, callback) {
 	}, categoryHtmlRender.render, {
 		parent : parent
 	}, function(err, items, context) {
-		var p = context.parent;
-		if (!err) {
-			items.forEach(function(item) {
-				amaCategory.updateTask(item, function(error, data) {
-					// callback(error, data);
+		if (context && context.parent) {
+			var p = context.parent;
+			if (!err) {
+				items.forEach(function(item) {
+					amaCategory.updateTask(item, function(error, data) {
+						// callback(error, data);
+					});
 				});
-			});
-			delete p._id;
-			p.status = "success";
-		} else {
-			delete p._id;
-			p.status = "error";
+				delete p._id;
+				p.status = "success";
+			} else {
+				delete p._id;
+				p.status = "error";
+			}
+			amaCategory.updateTask(p, callback)
+		}else{
+			callback("ama category fetch error");
 		}
-		amaCategory.updateTask(p, callback)
 	});
 };
 amaCategory.updateTask = function(item, callback) {
