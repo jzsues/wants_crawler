@@ -10,6 +10,7 @@ var TreeLoader = require("../lib/tree_loader");
 var amaRankItem = {
 	category_name : "ama_category",
 	rank_item_name : "ama_rank_item",
+	item_index_name : "ama_item_index",
 	rank_types : [ "bestsellers", "new-releases", "movers-and-shakers", "top-rated", "most-wished-for", "most-gifted" ],
 	limit_page : 6,
 	batch : utils.fdate(),
@@ -61,10 +62,21 @@ var rankItemDao = new GenericDao({
 	colname : amaRankItem.rank_item_name
 });
 
+var itemIndexDao = new GenericDao({
+	colname : amaRankItem.item_index_name
+});
+
 var categoryDbQueue = new TaskQueue({
 	size : 10,
 	drain : function() {
 		// logger.debug("category Db Queue drain");
+	}
+});
+
+var itemIndexUpdateDbQueue = new TaskQueue({
+	size : 20,
+	drain : function() {
+		// logger.debug("rank item update Db Queue drain");
 	}
 });
 
@@ -169,10 +181,15 @@ amaRankItem.fetch = function(category, callback) {
 							rank_number : item.rank_number,
 							batch : amaRankItem.batch
 						};
-						var updateTask = amaRankItem.updateRankItemTask(rank);
-						rankItemUpdateDbQueue.push(updateTask, function(e, d) {
+						var updateRankTask = amaRankItem.updateRankItemTask(rank);
+						rankItemUpdateDbQueue.push(updateRankTask, function(e, d) {
 							if (e)
 								logger.error("rankItemUpdateDbQueue with error:" + e);
+						});
+						var updateIndexTask = amaRankItem.updateItemIndexTask(rank);
+						itemIndexUpdateDbQueue.push(updateIndexTask, function(e, d) {
+							if (e)
+								logger.error("itemIndexUpdateDbQueue with error:" + e);
 						});
 					});
 				}
@@ -202,6 +219,25 @@ amaRankItem.updateRankItemTask = function(item) {
 			});
 		}
 	};
+}
+
+amaRankItem.updateItemIndexTask = function(item) {
+	return {
+		data : item,
+		run : function(cb) {
+			if (this.data._id) {
+				delete this.data._id;
+			}
+			itemIndexDao.update({
+				asin : this.data.asin
+			}, {
+				asin : this.data.asin,
+				batch : this.data.batch
+			}, function(error, data) {
+				cb(error, data);
+			});
+		}
+	}
 }
 
 amaRankItem.fetchRankItemTask = function(category, type) {
