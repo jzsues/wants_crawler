@@ -19,7 +19,7 @@ var categoryQueryDao = new GenericDao({
 });
 
 var categoryDbQueue = new TaskQueue({
-	size : 50,
+	size : 20,
 	drain : function() {
 		logger.debug("category Db Queue drain");
 	}
@@ -77,7 +77,7 @@ amaCategory.execute = function(parent) {
 	var task = amaCategory.fetchTask(parent);
 	httpQueue.push(task, function(error, data) {
 		if (error)
-			logger.error(error + "__2");
+			logger.error(error);
 	});
 }
 amaCategory.fetchTask = function(parent) {
@@ -93,35 +93,23 @@ amaCategory.fetch = function(parent, callback) {
 	httpConnector.get({
 		url : parent.url
 	}, categoryHtmlRender.render, {
-		parent : parent.category
-	}, function(err, items) {
+		parent : parent
+	}, function(err, items, context) {
+		var p = context.parent;
 		if (!err) {
 			items.forEach(function(item) {
-				var task = {
-					data : item,
-					run : function(cb) {
-						categoryUpdateDao.update({
-							category : this.data.category
-						}, this.data, function(error, result) {
-							if (error)
-								cb(error);
-							cb(error, result);
-						});
-					}
-				};
-				categoryDbQueue.push(task, function(error, data) {
-					if (error)
-						logger.error(error + "__1");
+				amaCategory.updateTask(item, function(error, data) {
+					//callback(error, data);
 				});
 			});
-			delete parent._id;
-			parent.status = "success";
+			delete p._id;
+			p.status = "success";
 		} else {
-			delete parent._id;
-			parent.status = "error";
+			delete p._id;
+			p.status = "error";
 		}
-		amaCategory.updateTask(parent, function(error, data) {
-			callback(error, data);
+		amaCategory.updateTask(p, function(error, data) {
+			//callback(error, data);
 		})
 	});
 };

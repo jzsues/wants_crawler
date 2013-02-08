@@ -26,7 +26,7 @@ var dbQueue = new TaskQueue({
 	}
 });
 var httpQueue = new TaskQueue({
-	size : 20,
+	size : 50,
 	drain : function() {
 		logger.debug("item detail Http Queue drain");
 		amaItemDetail.loop();
@@ -35,29 +35,33 @@ var httpQueue = new TaskQueue({
 
 amaItemDetail.loop = function() {
 	rankItemDao.find({
-		fetch_mark_batch : null
+		fetch_mark_batch : {
+			$ne : amaItemDetail.batch
+		}
 	}, 100, false, false, false, function(error, datas) {
 		if (error) {
 			logger.error(error);
 		} else {
 			if (datas.length > 0) {
+				var fetchTasks = [];
 				datas.forEach(function(rank) {
 					var fetchTask = amaItemDetail.fetchTask(rank);
-					httpQueue.push(fetchTask, function(error, item, context) {
-						if (!error) {
-							var updateItemDetailTask = amaItemDetail.updateItemDetailTask(item);
-							dbQueue.push(updateItemDetailTask, function(err, res) {
-								if (err) {
-									logger.error("update item detail with " + err);
-								}
-							});
-							var updateRankTask = amaItemDetail.updateRankTask(context.asin);
-							dbQueue.push(updateRankTask, function(err, res) {
-								if (err)
-									logger.error("update item rank with " + err);
-							});
-						}
-					});
+					fetchTasks.push(fetchTask);
+				});
+				httpQueue.pushAll(fetchTasks, function(error, item, context) {
+					if (!error) {
+						var updateItemDetailTask = amaItemDetail.updateItemDetailTask(item);
+						dbQueue.push(updateItemDetailTask, function(err, res) {
+							if (err) {
+								logger.error("update item detail with " + err);
+							}
+						});
+						var updateRankTask = amaItemDetail.updateRankTask(context.asin);
+						dbQueue.push(updateRankTask, function(err, res) {
+							if (err)
+								logger.error("update item rank with " + err);
+						});
+					}
 				});
 			} else {
 				_ama_item_detail_scan_status = _status.stop;

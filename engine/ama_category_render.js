@@ -32,7 +32,7 @@ amaCategoryHtmlRender.render = function(body, cb, context) {
 			}
 		});
 	} else {
-		cb("empty response body");
+		cb("empty response body", null, context);
 	}
 
 }
@@ -57,7 +57,7 @@ amaCategoryHtmlRender.process = function($, content, cb, context) {
 			name : name,
 			url : href,
 			status : "initial",
-			parent : context.parent,
+			parent : context.parent.category,
 			isLeaf : isLeaf
 		};
 		tmps.push(meta);
