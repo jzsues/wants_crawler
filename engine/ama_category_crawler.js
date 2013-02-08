@@ -99,7 +99,7 @@ amaCategory.fetch = function(parent, callback) {
 		if (!err) {
 			items.forEach(function(item) {
 				amaCategory.updateTask(item, function(error, data) {
-					//callback(error, data);
+					// callback(error, data);
 				});
 			});
 			delete p._id;
@@ -108,9 +108,7 @@ amaCategory.fetch = function(parent, callback) {
 			delete p._id;
 			p.status = "error";
 		}
-		amaCategory.updateTask(p, function(error, data) {
-			//callback(error, data);
-		})
+		amaCategory.updateTask(p, callback)
 	});
 };
 amaCategory.updateTask = function(item, callback) {
