@@ -27,7 +27,7 @@ var dbQueue = new TaskQueue({
 	}
 });
 var httpQueue = new TaskQueue({
-	size : 10,
+	size : 50,
 	drain : function() {
 		logger.debug("item detail Http Queue drain");
 		amaItemDetail.loop();
