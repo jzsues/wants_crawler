@@ -179,7 +179,8 @@ amaRankItem.fetch = function(category, callback) {
 							category : item.category,
 							type : item.type,
 							rank_number : item.rank_number,
-							batch : amaRankItem.batch
+							batch : amaRankItem.batch,
+							price : item.price
 						};
 						var updateRankTask = amaRankItem.updateRankItemTask(rank);
 						rankItemUpdateDbQueue.push(updateRankTask, function(e, d) {
