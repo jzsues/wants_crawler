@@ -10,27 +10,31 @@ var emsg = {
 // 处理原始html字符串
 amaCategoryHtmlRender.render = function(body, cb, context) {
 	if (body) {
-		jsdom.env({
-			html : body,
-			src : [ jquery ],
-			done : function(errors, window) {
-				var $ = window.$;
-				try {
-					// 截取页面左边物品类型html元素
-					var begin = body.indexOf("<ul id=\"zg_browseRoot\">");
-					var end = body.indexOf("<div class=\"zg_displayAd\">");
-					if (begin == -1 || end == -1) {
-						cb(emsg.htmlerror);
+		try {
+			jsdom.env({
+				html : body,
+				src : [ jquery ],
+				done : function(errors, window) {
+					var $ = window.$;
+					try {
+						// 截取页面左边物品类型html元素
+						var begin = body.indexOf("<ul id=\"zg_browseRoot\">");
+						var end = body.indexOf("<div class=\"zg_displayAd\">");
+						if (begin == -1 || end == -1) {
+							cb(emsg.htmlerror);
+						}
+						var content = body.substring(begin, end);
+						// console.log(content);
+						amaCategoryHtmlRender.process($, content, cb, context);
+					} catch (e) {
+						cb(e);
 					}
-					var content = body.substring(begin, end);
-					// console.log(content);
-					amaCategoryHtmlRender.process($, content, cb, context);
-				} catch (e) {
-					cb(e);
+					window.close();
 				}
-				window.close();
-			}
-		});
+			});
+		} catch (e) {
+			cb(e, null, context);
+		}
 	} else {
 		cb("empty response body", null, context);
 	}
