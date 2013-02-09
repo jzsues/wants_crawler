@@ -2,7 +2,7 @@ var wants = require("wants");
 var logger = wants.logger;
 var utils = wants.utils;
 var TaskQueue = require("../lib/task_queue");
-var httpConnector = require("../lib/http_connector");
+var HttpAgent = require("../lib/http_agent");
 var itemDetailHtmlRender = require("./ama_item_detail_render");
 var GenericDao = require("../dao/generic_dao");
 var amaItemDetail = {
@@ -10,7 +10,8 @@ var amaItemDetail = {
 	item_detail_name : "item_detail",
 	item_index_name : "ama_item_index",
 	base_url : "http://www.amazon.com/gp/product/_asin_",
-	batch : utils.fdate()
+	batch : utils.fdate(),
+	httpAgent : new HttpAgent()
 };
 
 var itemIndexDao = new GenericDao({
@@ -71,6 +72,7 @@ amaItemDetail.loop = function() {
 					}
 				});
 			} else {
+				logger.debug(" item detail scan task finish ");
 				_ama_item_detail_scan_status = _status.stop;
 			}
 		}
@@ -84,7 +86,9 @@ amaItemDetail.start = function(callback) {
 	} else {
 		logger.debug("ama item detail scan queue is runing!");
 	}
-	callback();
+	if (callback) {
+		callback();
+	}
 }
 
 amaItemDetail.updateItemIndexTask = function(index) {
@@ -120,7 +124,7 @@ amaItemDetail.fetchTask = function(item) {
 			var asin = this.data;
 			var url = amaItemDetail.base_url;
 			url = url.replace("_asin_", asin);
-			httpConnector.get({
+			amaItemDetail.httpAgent.get({
 				url : url
 			}, itemDetailHtmlRender.render, {
 				asin : asin

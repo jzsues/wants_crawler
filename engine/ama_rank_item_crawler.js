@@ -2,10 +2,11 @@ var wants = require("wants");
 var logger = wants.logger;
 var utils = wants.utils;
 var TaskQueue = require("../lib/task_queue");
-var httpConnector = require("../lib/http_connector");
+var HttpAgent = require("../lib/http_agent");
 var rankItemHtmlRender = require("./ama_rank_item_render");
 var GenericDao = require("../dao/generic_dao");
 var TreeLoader = require("../lib/tree_loader");
+var emitter = require("./event_emitter");
 
 var amaRankItem = {
 	category_name : "ama_category",
@@ -16,7 +17,8 @@ var amaRankItem = {
 	batch : utils.fdate(),
 	parent_meta_category : "baby-products",
 	current_category : "baby-products",
-	metas : []
+	metas : [],
+	httpAgent : new HttpAgent()
 };
 
 var treeLoader = new TreeLoader({
@@ -91,12 +93,13 @@ var httpQueue = new TaskQueue({
 	size : 50,
 	drain : function() {
 		logger.debug("rank item Http Queue drain");
-		_ama_rank_item_scan_status = _status.stop;
+		amaRankItem.loop();
 	}
 });
 amaRankItem.loop = function() {
 	treeLoader.all(function(error, results) {
-		if (results.length > 1) {
+		if (results.length > 0) {
+			var i = 0;
 			results.forEach(function(data) {
 				if (data.status != _status.success || data.batch != amaRankItem.batch) {
 					amaRankItem.fetch(data, function(error, category) {
@@ -143,9 +146,18 @@ amaRankItem.loop = function() {
 					});
 				} else {
 					logger.debug("category:" + data.category + ",name:" + data.name + " had been fetch");
+					i++;
 				}
 			});
-
+			if (i == results.size - 1) {
+				logger.debug("all category had been scan");
+				_ama_rank_item_scan_status = _status.stop;
+				emitter.emit("rank.item.end");
+			}
+		} else {
+			logger.debug("all category had been scan");
+			_ama_rank_item_scan_status = _status.stop;
+			emitter.emit("rank.item.end");
 		}
 	});
 };
@@ -154,10 +166,12 @@ amaRankItem.start = function(callback) {
 	if (_ama_rank_item_scan_status == _status.stop) {
 		amaRankItem.batch = utils.fdate();
 		_ama_rank_item_scan_status = _status.runing;
+		emitter.emit("rank.item.begin");
 		amaRankItem.loop();
-		callback();
 	} else {
 		logger.debug("ama rank item scan queue is runing!");
+	}
+	if (callback) {
 		callback();
 	}
 };
@@ -255,7 +269,7 @@ amaRankItem.fetchRankItemTask = function(category, type) {
 				type : type
 			},
 			run : function(cb) {
-				httpConnector.get({
+				amaRankItem.httpAgent.get({
 					url : this.data.url,
 					query : this.data.query
 				}, rankItemHtmlRender.render, {
@@ -274,7 +288,7 @@ amaRankItem.fetchRankItemTask = function(category, type) {
 				type : type
 			},
 			run : function(cb) {
-				httpConnector.get({
+				amaRankItem.httpAgent.get({
 					url : this.data.url,
 					query : this.data.query
 				}, rankItemHtmlRender.render, {

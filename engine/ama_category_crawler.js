@@ -1,13 +1,14 @@
 var wants = require("wants");
 var logger = wants.logger;
 var TaskQueue = require("../lib/task_queue");
-var httpConnector = require("../lib/http_connector");
+var HttpAgent = require("../lib/http_agent");
 var categoryHtmlRender = require("./ama_category_render");
 var GenericDao = require("../dao/generic_dao");
 
 var amaCategory = {
 	name : "ama_category",
-	beginUrl : "http://www.amazon.com/gp/new-releases"
+	beginUrl : "http://www.amazon.com/gp/new-releases",
+	httpAgent : new HttpAgent()
 };
 
 var categoryUpdateDao = new GenericDao({
@@ -70,7 +71,9 @@ amaCategory.start = function(callback) {
 	} else {
 		logger.debug("ama category scan queue is runing!");
 	}
-	callback();
+	if (callback) {
+		callback();
+	}
 };
 
 amaCategory.execute = function(parent) {
@@ -90,7 +93,7 @@ amaCategory.fetchTask = function(parent) {
 }
 amaCategory.fetch = function(parent, callback) {
 	parent.category = (parent.category) ? parent.category : "root"
-	httpConnector.get({
+	amaCategory.httpAgent.get({
 		url : parent.url
 	}, categoryHtmlRender.render, {
 		parent : parent
@@ -110,7 +113,7 @@ amaCategory.fetch = function(parent, callback) {
 				p.status = "error";
 			}
 			amaCategory.updateTask(p, callback)
-		}else{
+		} else {
 			callback("ama category fetch error");
 		}
 	});
