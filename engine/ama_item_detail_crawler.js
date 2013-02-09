@@ -7,7 +7,7 @@ var itemDetailHtmlRender = require("./ama_item_detail_render");
 var GenericDao = require("../dao/generic_dao");
 var amaItemDetail = {
 	rank_item_name : "ama_rank_item",
-	item_detail_name : "item_detail",
+	item_detail_name : "ama_item_detail",
 	item_index_name : "ama_item_index",
 	base_url : "http://www.amazon.com/gp/product/_asin_",
 	batch : utils.fdate(),
