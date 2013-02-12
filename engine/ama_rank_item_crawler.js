@@ -105,6 +105,7 @@ amaRankItem.loop = function() {
 					logger.debug("category:" + data.category + ",name:" + data.name + " had been fetch");
 					i++;
 				} else {
+					logger.debug("start fetch category:" + data.category);
 					amaRankItem.fetch(data, function(error, category) {
 						var task = null;
 						if (error) {
@@ -151,8 +152,9 @@ amaRankItem.loop = function() {
 					});
 				}
 			});
+			logger.error(results.size+" category had been scaned");
 			if (i == results.size - 1) {
-				logger.debug("all category had been scan");
+				logger.debug("all category had been scaned");
 				_ama_rank_item_scan_status = _status.stop;
 				emitter.emit("rank.item.end");
 			}
