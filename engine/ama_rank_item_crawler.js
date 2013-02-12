@@ -17,8 +17,7 @@ var amaRankItem = {
 	batch : utils.fdate(),
 	parent_meta_category : "baby-products",
 	current_category : "baby-products",
-	metas : [],
-	httpAgent : new HttpAgent()
+	metas : []
 };
 
 var treeLoader = new TreeLoader({
@@ -269,7 +268,8 @@ amaRankItem.fetchRankItemTask = function(category, type) {
 			},
 			run : function(cb) {
 				var rankItemHtmlRender = new AmaRankItemHtmlRender();
-				amaRankItem.httpAgent.get({
+				var httpAgent = new HttpAgent();
+				httpAgent.get({
 					url : this.data.url,
 					query : this.data.query
 				}, rankItemHtmlRender.render, {
@@ -289,7 +289,8 @@ amaRankItem.fetchRankItemTask = function(category, type) {
 			},
 			run : function(cb) {
 				var rankItemHtmlRender = new AmaRankItemHtmlRender();
-				amaRankItem.httpAgent.get({
+				var httpAgent = new HttpAgent();
+				httpAgent.get({
 					url : this.data.url,
 					query : this.data.query
 				}, rankItemHtmlRender.render, {
