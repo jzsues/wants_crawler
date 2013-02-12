@@ -90,7 +90,7 @@ var rankItemUpdateDbQueue = new TaskQueue({
 });
 
 var httpQueue = new TaskQueue({
-	size : 50,
+	size : 20,
 	drain : function() {
 		logger.debug("rank item Http Queue drain");
 		amaRankItem.loop();
