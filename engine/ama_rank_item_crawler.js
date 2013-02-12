@@ -152,8 +152,8 @@ amaRankItem.loop = function() {
 					});
 				}
 			});
-			logger.error(results.length+" category had been scaned");
-			if (i == results.length - 1) {
+			logger.error(results.length + " category had been scaned");
+			if (i == results.length) {
 				logger.debug("all category had been scaned");
 				_ama_rank_item_scan_status = _status.stop;
 				emitter.emit("rank.item.end");
