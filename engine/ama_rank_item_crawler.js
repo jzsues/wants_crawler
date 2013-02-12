@@ -101,7 +101,10 @@ amaRankItem.loop = function() {
 		if (results.length > 0) {
 			var i = 0;
 			results.forEach(function(data) {
-				if (data.status != _status.success || data.batch != amaRankItem.batch) {
+				if (data.status == _status.success && data.batch == amaRankItem.batch) {
+					logger.debug("category:" + data.category + ",name:" + data.name + " had been fetch");
+					i++;
+				} else {
 					amaRankItem.fetch(data, function(error, category) {
 						var task = null;
 						if (error) {
@@ -146,9 +149,6 @@ amaRankItem.loop = function() {
 						});
 
 					});
-				} else {
-					logger.debug("category:" + data.category + ",name:" + data.name + " had been fetch");
-					i++;
 				}
 			});
 			if (i == results.size - 1) {
@@ -214,7 +214,7 @@ amaRankItem.fetch = function(category, callback) {
 					callback(null, context.category);
 				} else {
 					// logger.debug(arguments);
-					callback("fetch context error", context.category)
+					callback("fetch context error");
 				}
 			}
 		});
