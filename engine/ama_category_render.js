@@ -17,21 +17,25 @@ AmaCategoryHtmlRender.prototype.render = function(body, cb, context) {
 				html : body,
 				src : [ jquery ],
 				done : function(errors, window) {
-					var $ = window.$;
-					try {
-						// 截取页面左边物品类型html元素
-						var begin = body.indexOf("<ul id=\"zg_browseRoot\">");
-						var end = body.indexOf("<div class=\"zg_displayAd\">");
-						if (begin == -1 || end == -1) {
-							cb(emsg.htmlerror);
+					if (errors) {
+						cb(errors, null, context);
+					} else {
+						var $ = window.$;
+						try {
+							// 截取页面左边物品类型html元素
+							var begin = body.indexOf("<ul id=\"zg_browseRoot\">");
+							var end = body.indexOf("<div class=\"zg_displayAd\">");
+							if (begin == -1 || end == -1) {
+								cb(emsg.htmlerror);
+							}
+							var content = body.substring(begin, end);
+							// console.log(content);
+							process($, content, cb, context);
+						} catch (e) {
+							cb(e);
 						}
-						var content = body.substring(begin, end);
-						// console.log(content);
-						process($, content, cb, context);
-					} catch (e) {
-						cb(e);
+						window.close();
 					}
-					window.close();
 				}
 			});
 		} catch (e) {

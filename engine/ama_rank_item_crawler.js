@@ -186,7 +186,7 @@ amaRankItem.fetch = function(category, callback) {
 		var fetchTasks = amaRankItem.fetchRankItemTask(category, type);
 		httpQueue.pushAll(fetchTasks, function(error, items, context) {
 			if (error) {
-				callback(error);
+				callback(error, context.category);
 			} else {
 				if (items) {
 					items.forEach(function(item) {
@@ -212,12 +212,7 @@ amaRankItem.fetch = function(category, callback) {
 						});
 					});
 				}
-				if (context) {
-					callback(null, context.category);
-				} else {
-					// logger.debug(arguments);
-					callback("fetch context error");
-				}
+				callback(null, context.category);
 			}
 		});
 
