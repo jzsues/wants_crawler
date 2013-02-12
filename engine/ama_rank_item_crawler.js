@@ -3,7 +3,7 @@ var logger = wants.logger;
 var utils = wants.utils;
 var TaskQueue = require("../lib/task_queue");
 var HttpAgent = require("../lib/http_agent");
-var rankItemHtmlRender = require("./ama_rank_item_render");
+var AmaRankItemHtmlRender = require("./ama_rank_item_render");
 var GenericDao = require("../dao/generic_dao");
 var TreeLoader = require("../lib/tree_loader");
 var emitter = require("./event_emitter");
@@ -117,7 +117,8 @@ amaRankItem.loop = function() {
 									}, function(err, data) {
 										if (err)
 											cb(err)
-										cb(null, data);
+										else
+											cb(null, data);
 									});
 								}
 							};
@@ -133,7 +134,8 @@ amaRankItem.loop = function() {
 									}, function(err, data) {
 										if (err)
 											cb(err)
-										cb(null, data);
+										else
+											cb(null, data);
 									});
 								}
 							};
@@ -269,6 +271,7 @@ amaRankItem.fetchRankItemTask = function(category, type) {
 				type : type
 			},
 			run : function(cb) {
+				var rankItemHtmlRender = new AmaRankItemHtmlRender();
 				amaRankItem.httpAgent.get({
 					url : this.data.url,
 					query : this.data.query
@@ -288,6 +291,7 @@ amaRankItem.fetchRankItemTask = function(category, type) {
 				type : type
 			},
 			run : function(cb) {
+				var rankItemHtmlRender = new AmaRankItemHtmlRender();
 				amaRankItem.httpAgent.get({
 					url : this.data.url,
 					query : this.data.query

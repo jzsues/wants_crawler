@@ -2,7 +2,7 @@ var wants = require("wants");
 var logger = wants.logger;
 var TaskQueue = require("../lib/task_queue");
 var HttpAgent = require("../lib/http_agent");
-var categoryHtmlRender = require("./ama_category_render");
+var CategoryHtmlRender = require("./ama_category_render");
 var GenericDao = require("../dao/generic_dao");
 
 var amaCategory = {
@@ -92,7 +92,8 @@ amaCategory.fetchTask = function(parent) {
 	};
 }
 amaCategory.fetch = function(parent, callback) {
-	parent.category = (parent.category) ? parent.category : "root"
+	parent.category = (parent.category) ? parent.category : "root";
+	var categoryHtmlRender = new CategoryHtmlRender();
 	amaCategory.httpAgent.get({
 		url : parent.url
 	}, categoryHtmlRender.render, {

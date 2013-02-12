@@ -3,7 +3,7 @@ var logger = wants.logger;
 var utils = wants.utils;
 var TaskQueue = require("../lib/task_queue");
 var HttpAgent = require("../lib/http_agent");
-var itemDetailHtmlRender = require("./ama_item_detail_render");
+var ItemDetailHtmlRender = require("./ama_item_detail_render");
 var GenericDao = require("../dao/generic_dao");
 var amaItemDetail = {
 	rank_item_name : "ama_rank_item",
@@ -124,6 +124,7 @@ amaItemDetail.fetchTask = function(item) {
 			var asin = this.data;
 			var url = amaItemDetail.base_url;
 			url = url.replace("_asin_", asin);
+			var itemDetailHtmlRender = new ItemDetailHtmlRender();
 			amaItemDetail.httpAgent.get({
 				url : url
 			}, itemDetailHtmlRender.render, {

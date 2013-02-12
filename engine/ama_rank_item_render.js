@@ -1,4 +1,6 @@
-var amaRankItemHtmlRender = {};
+var AmaRankItemHtmlRender = function() {
+
+};
 var wants = require("wants");
 var logger = wants.logger;
 var fs = require('fs');
@@ -8,7 +10,7 @@ var emsg = {
 	htmlerror : 'HTML格式有误'
 };
 
-amaRankItemHtmlRender.render = function(body, cb, context) {
+AmaRankItemHtmlRender.prototype.render = function(body, cb, context) {
 	if (body) {
 		jsdom.env({
 			html : body,
@@ -30,7 +32,7 @@ amaRankItemHtmlRender.render = function(body, cb, context) {
 						} else {
 							var name = title.text();
 							var url = title.attr("href");
-							var codes = amaRankItemHtmlRender.resolved_amazon_item_dp_url(url);
+							var codes = resolved_amazon_item_dp_url(url);
 							var link_name = (codes.length = 2) ? codes[0] : "";
 							var asin = (codes.length = 2) ? codes[1] : "";
 							var rank_number = r.find(".zg_rankNumber").text();
@@ -78,7 +80,7 @@ amaRankItemHtmlRender.render = function(body, cb, context) {
 	}
 
 }
-amaRankItemHtmlRender.resolved_amazon_item_dp_url = function(url) {
+function resolved_amazon_item_dp_url(url) {
 	// http://www.amazon.com/Cosco-High-Back-Booster-Ava/dp/B007HO4TJK/ref=zg_bsnr_baby-products_3/186-4389718-4216308
 	if (url) {
 		var s = url.split("/");
@@ -89,4 +91,4 @@ amaRankItemHtmlRender.resolved_amazon_item_dp_url = function(url) {
 
 }
 
-module.exports = amaRankItemHtmlRender;
+module.exports = AmaRankItemHtmlRender;

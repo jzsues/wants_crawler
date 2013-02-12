@@ -1,4 +1,6 @@
-var amaItemDetailRender = {};
+var AmaItemDetailRender = function() {
+
+};
 // var jq = require('jquery');
 var fs = require('fs');
 var jquery = fs.readFileSync("./jquery.js").toString();
@@ -6,7 +8,7 @@ var jsdom = require("jsdom");
 var emsg = {
 	htmlerror : 'HTML格式有误'
 };
-amaItemDetailRender.render = function(body, cb, context) {
+AmaItemDetailRender.prototype.render = function(body, cb, context) {
 	if (body) {
 		jsdom.env({
 			html : body,
@@ -52,13 +54,13 @@ amaItemDetailRender.render = function(body, cb, context) {
 						});
 					}
 					// var form = page.find("#handleBuy");
-					var e_prd_features = amaItemDetailRender.find(page, "Product Features");
+					var e_prd_features = find(page, "Product Features");
 					data.prd_features = e_prd_features.html();
-					var e_prd_specifications = amaItemDetailRender.find(page, "Product Specifications");
+					var e_prd_specifications = find(page, "Product Specifications");
 					data.prd_spec = e_prd_specifications.html();
-					var e_prd_details = amaItemDetailRender.find(page, "Product Details");
+					var e_prd_details = find(page, "Product Details");
 					data.prd_details = e_prd_details.html();
-					var e_prd_desc = amaItemDetailRender.find(page, "Product Description");
+					var e_prd_desc = find(page, "Product Description");
 					data.prd_desc = e_prd_desc.html();
 					cb(null, data, context);
 				} catch (e) {
@@ -72,14 +74,14 @@ amaItemDetailRender.render = function(body, cb, context) {
 	}
 
 };
-amaItemDetailRender.removeStyleAndScript = function(element) {
+function removeStyleAndScript(element) {
 	if (element.html() != "") {
 		var style = element.find("style");
 		console.log(style);
 		style.remove();
 	}
 }
-amaItemDetailRender.find = function(page, key_word) {
+function find(page, key_word) {
 	var e = page.find("h2:contains('" + key_word + "')");
 	if (e.length == 0) {
 		e = page.find("strong:contains('" + key_word + "')");
@@ -94,4 +96,4 @@ amaItemDetailRender.find = function(page, key_word) {
 	};
 };
 
-module.exports = amaItemDetailRender;
+module.exports = AmaItemDetailRender;

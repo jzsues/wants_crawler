@@ -1,4 +1,6 @@
-var amaCategoryHtmlRender = {};
+var AmaCategoryHtmlRender = function() {
+
+};
 // var $ = require('jquery');
 var fs = require('fs');
 var jquery = fs.readFileSync("./jquery.js").toString();
@@ -8,7 +10,7 @@ var emsg = {
 };
 
 // 处理原始html字符串
-amaCategoryHtmlRender.render = function(body, cb, context) {
+AmaCategoryHtmlRender.prototype.render = function(body, cb, context) {
 	if (body) {
 		try {
 			jsdom.env({
@@ -25,7 +27,7 @@ amaCategoryHtmlRender.render = function(body, cb, context) {
 						}
 						var content = body.substring(begin, end);
 						// console.log(content);
-						amaCategoryHtmlRender.process($, content, cb, context);
+						process($, content, cb, context);
 					} catch (e) {
 						cb(e);
 					}
@@ -41,7 +43,7 @@ amaCategoryHtmlRender.render = function(body, cb, context) {
 
 }
 
-amaCategoryHtmlRender.process = function($, content, cb, context) {
+function process($, content, cb, context) {
 	// console.log("begin process");
 	var ul = $(content);
 	var selected = ul.find(".zg_selected");
@@ -55,7 +57,7 @@ amaCategoryHtmlRender.process = function($, content, cb, context) {
 	$.each(hrefs, function(i, n) {
 		var href = $(n).attr("href");
 		var name = $(n).text();
-		var category = amaCategoryHtmlRender.resolved_url(href);
+		var category = resolved_url(href);
 		var meta = {
 			category : category,
 			name : name,
@@ -70,16 +72,16 @@ amaCategoryHtmlRender.process = function($, content, cb, context) {
 
 }
 
-amaCategoryHtmlRender.resolved_url = function(url) {
+function resolved_url(url) {
 	url = url.split("ref=")[0];
 	var tmps = url.split("/");
 	if (tmps.length == 7) {
-		return amaCategoryHtmlRender.resolved_amazon_url(url);
+		return resolved_amazon_url(url);
 	} else {
-		return amaCategoryHtmlRender.resolved_amazon_sub_url(url);
+		return resolved_amazon_sub_url(url);
 	}
 }
-amaCategoryHtmlRender.resolved_amazon_url = function(url) {
+function resolved_amazon_url(url) {
 	// http://www.amazon.com/gp/new-releases/appliances/ref=zg_bsnr_nav_0
 	if (url) {
 		return url.split("/")[5];
@@ -87,7 +89,7 @@ amaCategoryHtmlRender.resolved_amazon_url = function(url) {
 		return "";
 	}
 }
-amaCategoryHtmlRender.resolved_amazon_sub_url = function(url) {
+function resolved_amazon_sub_url(url) {
 	// "http://www.amazon.com/gp/new-releases/hi/3754161/ref=zg_bsnr_nav_hi_1_hi"
 	if (url) {
 		return url.split("/")[6];
@@ -95,4 +97,4 @@ amaCategoryHtmlRender.resolved_amazon_sub_url = function(url) {
 		return "";
 	}
 }
-module.exports = amaCategoryHtmlRender;
+module.exports = AmaCategoryHtmlRender;
