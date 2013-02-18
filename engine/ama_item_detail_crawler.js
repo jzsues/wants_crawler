@@ -1,6 +1,7 @@
 var wants = require("wants");
 var logger = wants.logger;
 var utils = wants.utils;
+var config = wants.config;
 var TaskQueue = require("../lib/task_queue");
 var HttpAgent = require("../lib/http_agent");
 var ItemDetailHtmlRender = require("./ama_item_detail_render");
@@ -22,13 +23,14 @@ var itemDetailDao = new GenericDao({
 	colname : amaItemDetail.item_detail_name
 });
 var dbQueue = new TaskQueue({
-	size : 30,
+	size : config.dbConnectPoolSize,
 	drain : function() {
-		logger.debug("db Queue drain");
+		// logger.debug("db Queue drain");
 	}
 });
 var httpQueue = new TaskQueue({
-	size : 50,
+	retryable : true,
+	size : config.httpConnectPoolSize,
 	drain : function() {
 		logger.debug("item detail Http Queue drain");
 		amaItemDetail.loop();
@@ -52,6 +54,11 @@ amaItemDetail.loop = function() {
 					fetchTasks.push(fetchTask);
 				});
 				httpQueue.pushAll(fetchTasks, function(error, item, context) {
+					logger.debug("item detail scan task done, asin: " + context.asin);
+					var index = {
+						asin : context.asin,
+						status : "success"
+					};
 					if (!error) {
 						var updateItemDetailTask = amaItemDetail.updateItemDetailTask(item);
 						dbQueue.push(updateItemDetailTask, function(err, res) {
@@ -59,20 +66,19 @@ amaItemDetail.loop = function() {
 								logger.error("update item detail with " + err);
 							}
 						});
-						var index = {
-							asin : context.asin,
-							status : "success"
-						};
-						var updateItemIndexTask = amaItemDetail.updateItemIndexTask(index);
-						dbQueue.push(updateItemIndexTask, function(err, res) {
-							if (err) {
-								logger.error("update item index with " + err);
-							}
-						});
+					} else {
+						index.status = "error";
+						logger.error("fetch item detail with " + error);
 					}
+					var updateItemIndexTask = amaItemDetail.updateItemIndexTask(index);
+					dbQueue.push(updateItemIndexTask, function(err, res) {
+						if (err) {
+							logger.error("update item index with " + err);
+						}
+					});
 				});
 			} else {
-				logger.debug(" item detail scan task finish ");
+				logger.debug("item detail batch scan task finish ");
 				_ama_item_detail_scan_status = _status.stop;
 			}
 		}

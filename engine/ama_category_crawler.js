@@ -1,5 +1,6 @@
 var wants = require("wants");
 var logger = wants.logger;
+var config = wants.config;
 var TaskQueue = require("../lib/task_queue");
 var HttpAgent = require("../lib/http_agent");
 var CategoryHtmlRender = require("./ama_category_render");
@@ -20,14 +21,15 @@ var categoryQueryDao = new GenericDao({
 });
 
 var categoryDbQueue = new TaskQueue({
-	size : 20,
+	size : config.dbConnectPoolSize,
 	drain : function() {
-		logger.debug("category Db Queue drain");
+		// logger.debug("category Db Queue drain");
 	}
 });
 
 var httpQueue = new TaskQueue({
-	size : 50,
+	retryable : true,
+	size : config.httpConnectPoolSize,
 	drain : function() {
 		logger.debug("category Http Queue drain");
 		amaCategory.loop();
@@ -79,6 +81,8 @@ amaCategory.start = function(callback) {
 amaCategory.execute = function(parent) {
 	var task = amaCategory.fetchTask(parent);
 	httpQueue.push(task, function(error, data) {
+		logger.debug("category scan task done, task parent:");
+		logger.debug(task.parent);
 		if (error)
 			logger.error(error);
 	});
@@ -131,9 +135,12 @@ amaCategory.updateTask = function(item, callback) {
 		}
 	};
 	categoryDbQueue.push(updateTask, function(error) {
-		if (error)
+		if (error) {
 			callback(error);
-		callback(null, updateTask.data);
+		} else {
+			callback(null, updateTask.data);
+		}
+
 	});
 }
 

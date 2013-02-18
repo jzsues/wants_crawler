@@ -1,6 +1,7 @@
 var wants = require("wants");
 var logger = wants.logger;
 var utils = wants.utils;
+var config = wants.config;
 var TaskQueue = require("../lib/task_queue");
 var HttpAgent = require("../lib/http_agent");
 var AmaRankItemHtmlRender = require("./ama_rank_item_render");
@@ -67,29 +68,16 @@ var itemIndexDao = new GenericDao({
 	colname : amaRankItem.item_index_name
 });
 
-var categoryDbQueue = new TaskQueue({
-	size : 10,
-	drain : function() {
-		// logger.debug("category Db Queue drain");
-	}
-});
-
-var itemIndexUpdateDbQueue = new TaskQueue({
-	size : 20,
-	drain : function() {
-		// logger.debug("rank item update Db Queue drain");
-	}
-});
-
-var rankItemUpdateDbQueue = new TaskQueue({
-	size : 20,
+var dbQueue = new TaskQueue({
+	size : config.dbConnectPoolSize,
 	drain : function() {
 		// logger.debug("rank item update Db Queue drain");
 	}
 });
 
 var httpQueue = new TaskQueue({
-	size : 20,
+	retryable : true,
+	size : config.httpConnectPoolSize,
 	drain : function() {
 		logger.debug("rank item Http Queue drain");
 		amaRankItem.loop();
@@ -143,11 +131,10 @@ amaRankItem.loop = function() {
 								}
 							};
 						}
-						categoryDbQueue.push(task, function(err, data) {
+						dbQueue.push(task, function(err, data) {
 							if (err)
-								logger.error("categoryDao update with error:" + err);
+								logger.error("dbQueue update with error:" + err);
 						});
-
 					});
 				}
 			});
@@ -184,6 +171,8 @@ amaRankItem.fetch = function(category, callback) {
 	types.forEach(function(type) {
 		var fetchTasks = amaRankItem.fetchRankItemTask(category, type);
 		httpQueue.pushAll(fetchTasks, function(error, items, context) {
+			logger.debug("fetch category done,context:");
+			logger.debug(context);
 			if (error) {
 				callback(error, context.category);
 			} else {
@@ -200,14 +189,14 @@ amaRankItem.fetch = function(category, callback) {
 							price : item.price
 						};
 						var updateRankTask = amaRankItem.updateRankItemTask(rank);
-						rankItemUpdateDbQueue.push(updateRankTask, function(e, d) {
+						dbQueue.push(updateRankTask, function(e, d) {
 							if (e)
-								logger.error("rankItemUpdateDbQueue with error:" + e);
+								logger.error("dbQueue with error:" + e);
 						});
 						var updateIndexTask = amaRankItem.updateItemIndexTask(rank);
-						itemIndexUpdateDbQueue.push(updateIndexTask, function(e, d) {
+						dbQueue.push(updateIndexTask, function(e, d) {
 							if (e)
-								logger.error("itemIndexUpdateDbQueue with error:" + e);
+								logger.error("dbQueue with error:" + e);
 						});
 					});
 				}

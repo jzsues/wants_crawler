@@ -17,7 +17,7 @@ module.exports = {
 	MongodbPort : 27017, // mongodb端口
 	MongodbConnectString : false, // 是否使用字符串连接，日入nae的连接方法，这个优先级高于地址+端口
 	MongodbConnectTimeout : 1000 * 30,// 连接超时
-	MongodbMaxConnect : 50,// 连接池连接数
+	MongodbMaxConnect : 100,// 连接池连接数
 	MongodbDefaultDbName : 'crawler',// 默认使用的数据库名
 	poolLogger : false,// 是否记录连接池的日志，建议关闭
 	isLog : false, // 是否开启日志，过多的记录日志会影响性能，但是能记录系统运行情况
@@ -57,6 +57,10 @@ module.exports = {
 	// 是否开启delate和gizp压缩，大并发压缩虽然可以减少传输字节数，但是会影响性能
 	isZlib : true,
 	// 只压缩数组中的content-type响应
-	ZlibArray : [ 'text/plain', 'application/javascript', 'text/css', 'application/xml', 'text/html' ]
+	ZlibArray : [ 'text/plain', 'application/javascript', 'text/css', 'application/xml', 'text/html' ],
+	// 最大并发http连接数
+	httpConnectPoolSize : 50,
+	// 最大db并发连接数
+	dbConnectPoolSize : 25
 
 }
