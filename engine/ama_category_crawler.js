@@ -63,6 +63,7 @@ amaCategory.start = function(callback) {
 			if (error)
 				logger.error(error);
 			if (count) {
+				logger.debug("start a resume category base scan,count:" + count);
 				amaCategory.loop();
 			} else {
 				logger.debug("start a new category base scan,base url:" + amaCategory.beginUrl);
