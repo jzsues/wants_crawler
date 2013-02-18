@@ -62,12 +62,13 @@ amaCategory.start = function(callback) {
 		categoryQueryDao.count({}, function(error, count) {
 			if (error)
 				logger.error(error);
-			if (count == 0) {
+			if (count) {
+				amaCategory.loop();
+			} else {
+				logger.debug("start a new category base scan,base url:" + amaCategory.beginUrl);
 				amaCategory.execute({
 					url : amaCategory.beginUrl
 				});
-			} else {
-				amaCategory.loop();
 			}
 		});
 	} else {
