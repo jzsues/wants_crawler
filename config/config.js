@@ -59,8 +59,8 @@ module.exports = {
 	// 只压缩数组中的content-type响应
 	ZlibArray : [ 'text/plain', 'application/javascript', 'text/css', 'application/xml', 'text/html' ],
 	// 最大并发http连接数
-	httpConnectPoolSize : 50,
+	httpConnectPoolSize : 25,
 	// 最大db并发连接数
-	dbConnectPoolSize : 25
+	dbConnectPoolSize : 10
 
 }

@@ -61,7 +61,13 @@ AmaItemDetailRender.prototype.render = function(body, cb, context) {
 						data.prd_features = e_prd_features.html();
 						var e_prd_specifications = find(page, "Product Specifications");
 						data.prd_spec = e_prd_specifications.html();
-						var e_prd_details = find(page, "Product Details");
+						var e_prd_details = page.find("#prodDetails");
+						if (e_prd_details.length > 0) {
+							console.log("asin:" + context.asin + " selector #prodDetails success");
+						} else {
+							console.log("asin:" + context.asin + " selector #prodDetails fail");
+							e_prd_details = find(page, "Product Details");
+						}
 						data.prd_details = e_prd_details.html();
 						var e_prd_desc = find(page, "Product Description");
 						data.prd_desc = e_prd_desc.html();
