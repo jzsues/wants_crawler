@@ -17,7 +17,8 @@ Test.rank = function(req, res) {
 };
 
 Test.detail = function(req, res) {
-	itemDetailCrawler.start(function() {
+	var asin = req.param.asin;
+	itemDetailCrawler.start(asin, function() {
 		res.sendjson(_monitor.statistics);
 	});
 };
