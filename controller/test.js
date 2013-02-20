@@ -17,8 +17,14 @@ Test.rank = function(req, res) {
 };
 
 Test.detail = function(req, res) {
-	itemDetailCrawler.start(function() {
-		res.sendjson(_monitor.statistics);
+	var asin = req.param.asin;
+	itemDetailCrawler.start(asin, function(error, item) {
+		if(item){
+			res.sendjson(item);
+		}else{
+			res.sendjson(_monitor.statistics);
+		}
+		
 	});
 };
 
