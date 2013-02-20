@@ -3,6 +3,7 @@ var AmaItemDetailRender = function() {
 };
 // var jq = require('jquery');
 var fs = require('fs');
+var KVParser = require("./parser_util");
 var jquery = fs.readFileSync("./jquery.js").toString();
 var jsdom = require("jsdom");
 var emsg = {
@@ -68,7 +69,7 @@ AmaItemDetailRender.prototype.render = function(body, cb, context) {
 							console.log("asin:" + context.asin + " selector #prodDetails fail");
 							e_prd_details = find(page, "Product Details");
 						}
-						data.prd_details = e_prd_details.html();
+						data.prd_details = parseProductDetails(e_prd_details.html());
 						var e_prd_desc = find(page, "Product Description");
 						data.prd_desc = e_prd_desc.html();
 						cb(null, data, context);
@@ -86,7 +87,14 @@ AmaItemDetailRender.prototype.render = function(body, cb, context) {
 };
 
 function parseProductDetails(htmlfragment) {
-	
+	var obj = {};
+	var kvs = KVParser.parseKeyvalues(htmlfragment);
+	for (var i = 0; i < kvs.length; i++) {
+		var k = kvs[i].k.replace(/\s/g,'_').toLowerCase();
+		obj[k] = kvs[i].v;
+	};
+
+	return obj;
 }
 
 function removeStyleAndScript(element) {
