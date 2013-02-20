@@ -103,16 +103,22 @@ amaItemDetail.start = function(asin, callback) {
 			});
 			httpQueue.push(fetchTask, function(error, item, context) {
 				amaItemDetail.saveFetchResult(error, item, context);
+				if (callback) {
+					callback(error, item);
+				}
 			});
 		} else {
 			_ama_item_detail_scan_status = _status.runing;
 			amaItemDetail.loop();
+			if (callback) {
+				callback(null, null);
+			}
 		}
 	} else {
 		logger.debug("ama item detail scan queue is runing!");
-	}
-	if (callback) {
-		callback();
+		if (callback) {
+			callback(null, null);
+		}
 	}
 }
 

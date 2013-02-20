@@ -13,7 +13,7 @@ module.exports = {
 	favicon : '/favicon.ico', // favicon存放地址
 	autoCreateFolders : true,
 	isMongodb : true, // 是否开启mongodb支持，注意：如果使用数据库存储session，这里必须开启
-	MongodbIp : '127.0.0.1', // mongodb地址
+	MongodbIp : 'd.mamplus.com', // mongodb地址
 	MongodbPort : 27017, // mongodb端口
 	MongodbConnectString : false, // 是否使用字符串连接，日入nae的连接方法，这个优先级高于地址+端口
 	MongodbConnectTimeout : 1000 * 30,// 连接超时
