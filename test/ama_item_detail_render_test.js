@@ -17,7 +17,7 @@ describe("ItemRendererTester", function() {
 			// 	json.prd_details[k] = kvs[i].v;
 			// };
 
-			console.log(json.prd_details);
+			console.log(json);
 		},{asin:1});
 
 		done();

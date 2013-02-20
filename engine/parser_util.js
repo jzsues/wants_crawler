@@ -1,7 +1,7 @@
 
 var KeyValueSeparator = {
-	sep : ':',
-	prfx : '##',
+	sep : '#@#@',
+	prfx : '#!#!',
 	alias : [
 		{sep: ':', prfx: '<li><b>'},
 		{sep: '<\/td><td class="value">', prfx: '<td class="label">'}
