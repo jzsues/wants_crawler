@@ -84,6 +84,11 @@ AmaItemDetailRender.prototype.render = function(body, cb, context) {
 	}
 
 };
+
+function parseProductDetails(htmlfragment) {
+	
+}
+
 function removeStyleAndScript(element) {
 	if (element.html() != "") {
 		var style = element.find("style");

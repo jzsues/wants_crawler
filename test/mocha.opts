@@ -1,5 +1,4 @@
 --require should
---require test/support/http
 --reporter list
 --growl
 --timeout 100000
