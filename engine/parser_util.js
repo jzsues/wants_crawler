@@ -38,18 +38,18 @@ KeyValueSeparator.parseKeyvalues = function (htmlfragment, mapper, isList) {
 		if (htmlfragment.search(mapper.alias[i].sep) > 0) {
 			kvs = htmlfragment.match(new RegExp(mapper.alias[i].pattern, 'g'));
 			aliasId = i;
-			console.log('hit!!!! at:'+i + ' kvs:'+kvs);
+			//console.log('hit!!!! at:'+i + ' kvs:'+kvs);
 			break;
 		}
 	}
 
 	if (aliasId >= 0 && kvs && kvs.length > 0) {
-		console.log('kvs size:'+kvs.length+'\n');
+		//console.log('kvs size:'+kvs.length+'\n');
 		for (var i = 0; i < kvs.length; i++) {
 			kvs[i] = kvs[i].replace(/\n/g,'');
 			kvs[i] = kvs[i].replace(new RegExp(mapper.alias[aliasId].sep, 'g'), KeyValueSeparator.sep);
 			kvs[i] = text(kvs[i]);
-			console.log(kvs[i]);
+			//console.log(kvs[i]);
 		}
 
 		for (var i = 0; i < kvs.length; i++) {
