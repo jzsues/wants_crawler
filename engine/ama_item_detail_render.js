@@ -74,21 +74,10 @@ AmaItemDetailRender.prototype.render = function(body, cb, context) {
 						}
 						
 						var e_prd_desc = find(page, "Product Description");
-
-						try {
-							data.prd_features = parseProductFeatures(e_prd_features.html());
-							data.prd_spec = parseProductSpec(e_prd_specifications.html());
-							data.prd_details = parseProductDetails(e_prd_details.html());
-							data.prd_desc = parseProductDescription(e_prd_desc.html());
-						} catch (e1) {
-							logger.debug('html1>>>>>>>>>>>: \n' + (e_prd_features.html())?"success":"error" + '\n<<<<<<<<<<<');
-							logger.debug('html2>>>>>>>>>>>: \n' + (e_prd_specifications.html())?"success":"error"+ '\n<<<<<<<<<<');
-							logger.debug('html3>>>>>>>>>>>: \n' + (e_prd_details.html())?"success":"error"+ '\n<<<<<<<<<<');
-							logger.debug('html4>>>>>>>>>>>: \n' + (e_prd_desc.html())?"success":"error"+ '\n<<<<<<<<<<');
-							logger.debug(e1);
-							cb(e1, null, context);
-						}
-
+						data.prd_features = parseProductFeatures(e_prd_features.html());
+						data.prd_spec = parseProductSpec(e_prd_specifications.html());
+						data.prd_details = parseProductDetails(e_prd_details.html());
+						data.prd_desc = parseProductDescription(e_prd_desc.html());
 						cb(null, data, context);
 					} catch (e) {
 						cb(e, null, context);
