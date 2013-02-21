@@ -9,6 +9,9 @@ var jsdom = require("jsdom");
 var emsg = {
 	htmlerror : 'HTML格式有误'
 };
+var wants = require("wants");
+var logger = wants.logger;
+var config = wants.config;
 AmaItemDetailRender.prototype.render = function(body, cb, context) {
 	if (body) {
 		jsdom.env({
@@ -59,9 +62,9 @@ AmaItemDetailRender.prototype.render = function(body, cb, context) {
 						}
 						// var form = page.find("#handleBuy");
 						var e_prd_features = find(page, "Product Features");
-						data.prd_features = e_prd_features.html();
+						
 						var e_prd_specifications = find(page, "Product Specifications");
-						data.prd_spec = e_prd_specifications.html();
+						
 						var e_prd_details = page.find("#prodDetails");
 						if (e_prd_details.length > 0) {
 							console.log("asin:" + context.asin + " selector #prodDetails success");
@@ -69,9 +72,23 @@ AmaItemDetailRender.prototype.render = function(body, cb, context) {
 							console.log("asin:" + context.asin + " selector #prodDetails fail");
 							e_prd_details = find(page, "Product Details");
 						}
-						data.prd_details = parseProductDetails(e_prd_details.html());
+						
 						var e_prd_desc = find(page, "Product Description");
-						data.prd_desc = e_prd_desc.html();
+
+						try {
+							data.prd_features = parseProductFeatures(e_prd_features.html());
+							data.prd_spec = parseProductSpec(e_prd_specifications.html());
+							data.prd_details = parseProductDetails(e_prd_details.html());
+							data.prd_desc = parseProductDescription(e_prd_desc.html());
+						} catch (e1) {
+							logger.debug('html1>>>>>>>>>>>: \n' + (e_prd_features.html())?"success":"error" + '\n<<<<<<<<<<<');
+							logger.debug('html2>>>>>>>>>>>: \n' + (e_prd_specifications.html())?"success":"error"+ '\n<<<<<<<<<<');
+							logger.debug('html3>>>>>>>>>>>: \n' + (e_prd_details.html())?"success":"error"+ '\n<<<<<<<<<<');
+							logger.debug('html4>>>>>>>>>>>: \n' + (e_prd_desc.html())?"success":"error"+ '\n<<<<<<<<<<');
+							logger.debug(e1);
+							cb(e1, null, context);
+						}
+
 						cb(null, data, context);
 					} catch (e) {
 						cb(e, null, context);
@@ -88,11 +105,45 @@ AmaItemDetailRender.prototype.render = function(body, cb, context) {
 
 function parseProductDetails(htmlfragment) {
 	var obj = {};
-	var kvs = KVParser.parseKeyvalues(htmlfragment);
-	for (var i = 0; i < kvs.length; i++) {
-		var k = kvs[i].k.replace(/\s/g,'_').toLowerCase();
-		obj[k] = kvs[i].v;
-	};
+
+	if (htmlfragment) {
+		var kvs = KVParser.parseKeyvalues(htmlfragment, KVParser.KV_PATTERN_PROD_DETAILS);
+		for (var i = 0; i < kvs.length; i++) {
+			var k = kvs[i].k.replace(/\s/g,'_').toLowerCase();
+			obj[k] = kvs[i].v;
+		};
+
+	}
+
+	return obj;
+}
+
+function parseProductFeatures (htmlfragment) {
+	if (htmlfragment) {
+		var kvs = KVParser.parseKeyvalues(htmlfragment, KVParser.KV_PATTERN_PROD_FEATURES, true);
+		return kvs;
+	} else {
+		return [];
+	}
+
+}
+
+function parseProductDescription (htmlfragment) {
+	//return htmlfragment;
+	return KVParser.text(htmlfragment);
+}
+
+function parseProductSpec (htmlfragment) {
+
+	var obj = {};
+
+	if (htmlfragment) {
+		var kvs = KVParser.parseKeyvalues(htmlfragment, KVParser.KV_PATTERN_PROD_SPEC);
+		for (var i = 0; i < kvs.length; i++) {
+			var k = kvs[i].k.replace(/\s/g,'_').toLowerCase();
+			obj[k] = kvs[i].v;
+		};
+	}	
 
 	return obj;
 }
