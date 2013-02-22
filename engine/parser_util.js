@@ -6,7 +6,7 @@ var KeyValueSeparator = {
 	KV_PATTERN_PROD_DETAILS : {
 		alias : [
 			{sep: ':', pattern: '<li><b>(.(?!<\/li>)|\n)+<\/b>(.(?!<\/b>)|\n)*<\/li>'},
-			{sep: '<\/td>[\s]*<td class="value">', pattern: '<tr[^<>]*>[\s ]*<td class="label">.+<\/td>[\s ]*<td class="value">(.(?!<\/tr>)|[\n\r])*<\/td><\/tr>'}
+			{sep: '<\/td>[\s ]*<td class="value">', pattern: '<tr[^<>]*>[\s ]*<td class="label">.+<\/td>[\s ]*<td class="value">(.(?!<\/tr>)|[\n\r])*<\/td><\/tr>'}
 		]	
 	},
 
