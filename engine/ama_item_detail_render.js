@@ -93,6 +93,7 @@ AmaItemDetailRender.prototype.render = function(body, cb, context) {
 };
 
 function parseProductDetails(htmlfragment) {
+	logger.debug('prod_details>>>>>>>>>>>>>>\n' + htmlfragment + '\n<<<<<<<<<<<<<<<<<');
 	var obj = {};
 
 	if (htmlfragment) {
@@ -118,8 +119,10 @@ function parseProductFeatures (htmlfragment) {
 }
 
 function parseProductDescription (htmlfragment) {
-	//return htmlfragment;
-	return KVParser.text(htmlfragment);
+	if (htmlfragment)
+		return KVParser.text(htmlfragment);
+	else 
+		return '';
 }
 
 function parseProductSpec (htmlfragment) {

@@ -9,25 +9,26 @@ var renderer = new AmaItemDetailRender();
 
 
 describe("ItemRendererTester", function() {
-	it("testing", function(done) {
-		// var i1 = fs.readFileSync('./data/i1','UTF-8');
+	// it("testing", function(done) {
+	// 	// var i1 = fs.readFileSync('./data/i1','UTF-8');
 
-		// renderer.render(i1, function(err, json, ctx){
-		// 	console.log(json);
-		// },{asin:1});
+	// 	// renderer.render(i1, function(err, json, ctx){
+	// 	// 	console.log(json);
+	// 	// },{asin:1});
 
-		crawler.start('B006Z6E8AG',function(err, item){
-			console.log(item);
-			done();
-		});
+	// 	crawler.start('B000IDSLOG',function(err, item){
+	// 		console.log(item);
+	// 		done();
+	// 	});
 				
-	});
-
-	// it("testing KVParser", function(done) {
-	// 	var txt = '\n <h2>Product Description</h2>\n\n\n\n<div class="disclaim">Platform: <strong>Nintendo Wii</strong></div>\n\n\n\n\n    \n     <div class="content">\n\n\n           <h3 class="productDescriptionSource">From the Manufacturer</h3>\n       <div class="productDescriptionWrapper">\n       <html>     <head>                  <link type="text/css" href="dp20.css" rel="stylesheet" />         <link type="text/css" href="aplus20.css" rel="stylesheet" />     </head>     <body>         <div class="singlecolumnminwidth">             <div class="bucket" id="productDescription">                                  <div class="content">                     <div class="productDescriptionWrapper">                         <div class="aplus">                                                  <div style="width: 980px;">                          <div class="leftImage" style="width: 460px; height: 820px;">                                                      <img src="https://images-na.ssl-images-amazon.com/images/G/01/videogames/detail-page/jddisney-imageblock.jpg" alt="Just Dance Disney" width="455" height="810" border="0" usemap="#Map" />                           <map name="Map">                             <area shape="rect" coords="227,646,441,775" href="https://images-na.ssl-images-amazon.com/images/G/01/videogames/detail-page/jddisney-screen4.jpg" target="_blank" alt="Screen 3" />                             <area shape="rect" coords="9,520,223,645" href="https://images-na.ssl-images-amazon.com/images/G/01/videogames/detail-page/jddisney-screen1.jpg" target="_blank" alt="Image 1" />                                                        <area shape="rect" coords="229,519,441,643" href="https://images-na.ssl-images-amazon.com/images/G/01/videogames/detail-page/jddisney-screen2.jpg" target="_blank" alt="Screen 2" />                              <area shape="rect" coords="10,647,221,772" href="https://images-na.ssl-images-amazon.com/images/G/01/videogames/detail-page/jddisney-screen3.jpg" target="_blank" alt="Screen 4" />                           </map><br /><br />                                                    </div>                                                  <div style="width: 500px; float: left;">                          <h4>Just Dance®: Disney Party – The ultimate dance game for the whole family!</h4>                          <p>Just Dance and Disney are working in collaboration to create the greatest dance game for the whole family – Just Dance: Disney Party on Wii.</p>                          <p>Dance like a star to 25 songs from Disney favorites. Play with up to four players to experience the ultimate in family fun. With an amazing selection of family favorite songs, fun dances, and kid-friendly gameplay, children of all ages can dance along with family and friends!</p> <h4>Disney Favorites</h4> <ul><li>The Aristocats - "Ev\'rybody Wants to Be a Cat"</li> <li>Beauty and the Beast - "Be Our Guest"</li> <li>Bolt -  "I Thought I Lost You"</li> <li>Cinderella – "Bibbidi-Bobbidi–Boo"</li> <li>Enchanted - "That\'s How You Know"</li> <li>The Jungle Book - "The Bare Necessities"</li> <li>Lilo &amp; Stitch - "Hawaiian Roller Coaster Ride"</li> <li>The Little Mermaid - "Under the Sea"</li> <li>Mary Poppins - "Supercalifragilisticexpialidocious"</li> <li>The Muppets – "The Muppet Show Theme"</li> <li>Peter Pan - "Following the Leader"</li> <li>Tangled - "Something That I Want"</li> <li>Tangled - "I\'ve Got a Dream"</li> <li>Tinker Bell - "Fly To Your Heart"</li></ul> <h4>Disney Channel Original Series and Movies  </h4> <ul><li>A.N.T. Farm - "Calling All the Monsters"</li> <li>Camp Rock - "This Is Me"</li> <li>Good Luck Charlie - "Hang In There Baby"</li> <li>Hannah Montana - "Hoedown Throwdown"</li> <li>High School Musical - "We\'re All In This Together"</li> <li>Jessie - "Jessie Theme Song"</li> <li>Phineas and Ferb - "S.I.M.P. (Squirrels In My Pants)"</li> <li>Shake It Up - "Shake It Up"</li> <li>Shake It Up - "Twist My Hips"</li> <li>Wizards of Waverly Place - "Everything Is Not As It Seems"</li></ul> <h4>Disney Parks  </h4> <ul><li>The iconic Disney Parks song "It\'s A Small World"</li></ul>                    </div>     <div style="width: 980px; float: left; text-align: left;">      <h4>Key Game Features  </h4> <strong>Brand New Dances and Choreographies</strong> <ul><li>Songs from Disney Favorites for the whole family: The Jungle Book, Beauty and the Beast, The Little Mermaid, Cinderella, Peter Pan, Tangled, Lilo &amp; Stitch, Tinker Bell, Enchanted, The Muppets, Bolt, Mary Poppins, and The Aristocats.</li> <li>Dances from the hottest Disney Channel shows: Shake It Up, Phineas and Ferb, Jessie, Hannah Montana, A.N.T. Farm,  Wizards of Waverly Place, Camp Rock, High School Musical, and Good Luck Charlie.</li></ul> <strong>Featuring Some of Your Favorite Disney Characters</strong> <ul><li>Experience immersive visual effects and backgrounds inspired by the TV shows and movies. Dance on the Shake It Up  stage or at the park with Phineas and Ferb.</li></ul> <strong>Family Fun and Party Fun</strong> <ul><li>Play cooperatively for the highest team score or play Freeze &amp; Shake for extra points.</li></ul> <strong>Special Features for Wii</strong> <ul><li>Classic four-player co-op on Wii and a unique Balloon mode where kids compete against each other to get more items  and earn more points by shaking their Wii Remote.</li></ul> <strong>New and Improved Features Offer Strong Benefits for Parents</strong> <ul><li>Playlists allow mom to select all her kids’ favorite songs for nonstop dancing.</li> <li>On-screen lyrics help kids learn the words and sing along as they dance.</li> <li>Simple menu icons allow kids to navigate on their own!</li></ul> </div>                         </div>                        </div>                                                                                 </div>                         <div class="emptyClear"> </div>                     </div>                 </div>             </div>'
-	// 	console.log(txt);
-	// 	KVParser.parseKeyvalues(txt,KVParser.KV_PATTERN_PROD_DESC);
-	// 	done();
 	// });
+
+	it("testing KVParser", function(done) {
+		var txt = fs.readFileSync('./data/B000IDSLOG.htm','UTF-8');
+		//txt = txt.replace(/<script[^<>]*>(.|\n|\r)*<\/script>|<style[^<>]*>(.|\n|\r)*<\/style>|&nbsp;/ig,'');
+		//console.log(txt);
+		KVParser.parseKeyvalues(txt,KVParser.KV_PATTERN_PROD_DETAILS);
+		done();
+	});
 
 });
