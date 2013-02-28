@@ -1,4 +1,4 @@
-var DataPersister = function() {
+var DataPersister = function () {
 
 };
 

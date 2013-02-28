@@ -1,7 +1,6 @@
-var DbSeq = function() {
+var DbSeq = function () {
 
 };
-
 
 
 module.exports = DbSeq;
